@@ -3,7 +3,30 @@ import User from '../models/user.model.js';
 
 export const getArticles = async (req, res, next) => {
   try {
-    
+    const {page = 1, limit = 10, title} = req.query;
+    const perPage = parseInt(limit);
+    const currentPage = parseInt(page);
+
+    const query = title ? {title: {$regex: new RegExp(title, 'i')}} : {};
+
+    const totalArticles = await Article.countDocuments(query);
+    const totalPages = Math.ceil(totalArticles / perPage);
+
+    const articles = await Article.find(query)
+    .populate({
+      path: 'owner',
+      select: 'fullName email age'
+    })
+    .skip((currentPage - 1) * perPage)
+    .limit(perPage)
+    .exec();
+
+    res.json({
+      articles,
+      currentPage,
+      totalPages,
+      totalArticles,
+    })
   } catch (err) {
     next(err);
   }
