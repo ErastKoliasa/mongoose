@@ -1,3 +1,4 @@
+import Article from '../models/article.model.js';
 import User from '../models/user.model.js';
 
 export const getUsers = async (req, res, next) => {
@@ -12,7 +13,21 @@ export const getUsers = async (req, res, next) => {
 
 export const getUserByIdWithArticles = async (req, res, next) => {
   try {
+    const userId = req.params.id;
 
+    const user = await User.findById(userId);
+    if(!user){
+      return res.status(404).json({message: "User not found!"});
+    }
+
+    const articles = await Article.find({owner: userId}, "title subtitle createdAt");
+
+    const userWithArticles = {
+      user,
+      articles
+    };
+
+    res.json(userWithArticles);
   } catch (err) {
     next(err);
   }
