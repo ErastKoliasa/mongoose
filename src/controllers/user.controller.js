@@ -68,7 +68,17 @@ export const updateUserById = async (req, res, next) => {
 
 export const deleteUserById = async (req, res, next) => {
   try {
+    const userId = req.params.id;
+  
+    const user = await User.findById(userId);
+    if(!user){
+      return res.status(404).json({message: "User not found!"});
+    }
 
+    await Article.deleteMany({owner: userId});
+    await user.deleteOne();
+    
+    res.json({message: "User deleted successfully."})
   } catch (err) {
     next(err);
   }
