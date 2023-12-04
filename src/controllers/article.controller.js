@@ -75,7 +75,26 @@ export const updateArticleById = async (req, res, next) => {
 
 export const deleteArticleById = async (req, res, next) => {
   try {
+    const articleId = req.params.id;
 
+    const article = await Article.findById(articleId);
+    if(!article){
+      return res.status(404).json({message: "Article not found!"});
+    }
+
+    //const userId = '656df5d75a632eb8a2dfbb39'
+    if(article.owner.toString() !== userId){
+      return res.status(403).json({message: "You are not the owner of this article!"})
+    }
+
+    const owner = await User.findById(article.owner);
+    if(owner){
+      owner.numberOfArticles -= 1;
+      await owner.save();
+    }
+
+    await article.deleteOne();
+    res.json({message: "Article deleted successfully!"});
   } catch (err) {
     next(err);
   }
