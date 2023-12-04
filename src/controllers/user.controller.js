@@ -2,7 +2,9 @@ import User from '../models/user.model.js';
 
 export const getUsers = async (req, res, next) => {
   try {
-
+    const {sortBy} = req.query;
+    const users = await User.find({}, 'id fullName email age').sort(sortBy);
+    res.json(users);
   } catch (err) {
     next(err);
   }
