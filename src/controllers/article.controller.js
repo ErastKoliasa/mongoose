@@ -11,7 +11,14 @@ export const getArticles = async (req, res, next) => {
 
 export const getArticleById = async (req, res, next) => {
   try {
+    const articleId = req.params.id;
 
+    const article = await Article.findById(articleId).populate("owner", "fullName email age");
+    if(!article){
+      return res.status(404).json({message: "Article not found!"});
+    }
+    
+    res.json(article);
   } catch (err) {
     next(err);
   }
