@@ -20,7 +20,9 @@ export const getUserByIdWithArticles = async (req, res, next) => {
 
 export const createUser = async (req, res, next) => {
   try {
-
+    const newUser = new User(req.body);
+    await newUser.save();
+    res.json(newUser)
   } catch (err) {
     next(err);
   }
