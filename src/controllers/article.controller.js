@@ -122,3 +122,18 @@ export const deleteArticleById = async (req, res, next) => {
     next(err);
   }
 }
+
+export const getUserWhoLikedArticle = async (req, res, next) => {
+  try{
+    const articleId = req.params.articleId;
+    const article = await Article.findById(articleId).populate('likes', 'fullName age email');
+
+    if(!article){
+      return res.status(404).json("Article not found!");
+    }
+
+    res.json(article.likes)
+  } catch(err){
+    next(err);
+  }
+}

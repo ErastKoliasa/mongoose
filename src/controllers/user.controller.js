@@ -84,3 +84,36 @@ export const deleteUserById = async (req, res, next) => {
   }
 }
 
+export const likeArticle = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const articleId = req.params.articleId;
+
+    const user = await User.findById(userId);
+    const article = await Article.findById(articleId);
+
+    if (!user || !article){
+      return res.status(404).json({message: "User or article not found!"})
+    }
+
+    const isLiked = user.likedArticles.includes(articleId);
+    let message;
+
+    if(isLiked){
+      user.likedArticles = user.likedArticles.filter(likeArticle => likeArticle.toString() !== articleId);
+      article.likes = article.likes.filter(likedUser => likedUser.toString() !== userId);
+      message = 'Article unliked successfully!';
+    } else{
+      user.likedArticles.push(articleId);
+      article.likes.push(userId);
+      message = 'Article liked successfully!';
+    }
+
+    await user.save();
+    await article.save();
+
+    res.json({message: message})
+  } catch(err){
+    next(err)
+  }
+}

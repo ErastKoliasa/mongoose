@@ -12,6 +12,7 @@ const userRouter = Router();
 userRouter
   .get('/', getUsers)
   .get('/:id', getUserByIdWithArticles)
+  .get('/:userId/like-article/:articleId')
   .post('/', createUser)
   .put('/:id', updateUserById)
   .delete('/:id', deleteUserById);
